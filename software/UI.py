@@ -1,117 +1,43 @@
-import cv2
 import tkinter as tk
-from tkinter import Label, Button, Frame, Text, Scrollbar, END
-from PIL import Image, ImageTk
-from ultralytics import YOLO
-import datetime
+from tkinter import Frame, Label, Text, Scrollbar
 
-class WebcamApp:
+class FourQuadrantApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("ForgeCam - Object Detection Security")
+        self.root.title("ForgeCam - 4 Quadrant Layout")
         self.root.geometry("1200x700")
         self.root.configure(bg="#1e1e1e")
 
-        # Configure grid (2 columns)
-        self.root.columnconfigure(0, weight=3)  # Left side (video)
-        self.root.columnconfigure(1, weight=1)  # Right side (notifications)
-        self.root.rowconfigure(0, weight=1)
+        # Configure 2x2 grid
+        self.root.rowconfigure([0, 1], weight=1)
+        self.root.columnconfigure([0, 1], weight=1)
 
-        # YOLO model
-        self.model = YOLO("yolov8n.pt") # need to re update with the trained model
+        # ==== Q1: Top-Left ====
+        self.q1_frame = Frame(self.root, bg="#1e1e1e", bd=2, relief="groove")
+        self.q1_frame.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+        self.q1_label = Label(self.q1_frame, text="Q1: Camera Feed", bg="#1e1e1e", fg="white")
+        self.q1_label.pack(fill="both", expand=True)
 
-        # Webcam
-        self.video_source = 0
-        self.vid = cv2.VideoCapture(self.video_source)
+        # ==== Q2: Top-Right ====
+        self.q2_frame = Frame(self.root, bg="#252526", bd=2, relief="groove")
+        self.q2_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
+        self.q2_label = Label(self.q2_frame, text="Q2: Detection Stats", bg="#252526", fg="white")
+        self.q2_label.pack(fill="both", expand=True)
 
-        # ==== LEFT SIDE (Video Feed) ====
-        self.video_frame = Frame(self.root, bg="#1e1e1e")
-        self.video_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        # ==== Q3: Bottom-Left ====
+        self.q3_frame = Frame(self.root, bg="#1e1e1e", bd=2, relief="groove")
+        self.q3_frame.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
+        self.q3_label = Label(self.q3_frame, text="Q3: Logs", bg="#1e1e1e", fg="lime")
+        self.q3_label.pack(fill="both", expand=True)
 
-        self.label = Label(self.video_frame, bg="#1e1e1e")
-        self.label.pack(fill="both", expand=True)
-
-        self.capture_button = Button(
-            self.video_frame,
-            text="Capture Image",
-            command=self.capture_image,
-            bg="#2e2e2e",
-            fg="white",
-            font=("Helvetica", 12),
-            relief="flat"
-        )
-        self.capture_button.pack(pady=10)
-
-        # ==== RIGHT SIDE (Notifications) ====
-        self.right_frame = Frame(self.root, bg="#252526")
-        self.right_frame.grid(row=0, column=1, sticky="nsew", padx=(0,10), pady=10)
-
-        self.log_label = Label(
-            self.right_frame,
-            text="Detected Objects",
-            bg="#252526",
-            fg="white",
-            font=("Helvetica", 14, "bold")
-        )
-        self.log_label.pack(pady=10)
-
-        # Scrollable text box
-        self.text_box = Text(
-            self.right_frame,
-            bg="#1e1e1e",
-            fg="lime",
-            font=("Courier", 11),
-            height=30,
-            width=35
-        )
-        self.text_box.pack(padx=10, pady=10, fill="both", expand=True)
-
-        self.scrollbar = Scrollbar(self.text_box)
-        self.text_box.config(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.pack(side="right", fill="y")
-
-        # Start video loop
-        self.update_frame()
-        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-
-    def update_frame(self):
-        ret, frame = self.vid.read()
-        if ret:
-            results = self.model(frame, verbose=False)
-            annotated_frame = results[0].plot()
-
-            # Log detections
-            for box in results[0].boxes:
-                cls = self.model.names[int(box.cls)]
-                conf = float(box.conf)
-                timestamp = datetime.datetime.now().strftime("%H:%M:%S")
-                self.log_detection(cls, conf, timestamp)
-
-            annotated_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
-            self.photo = ImageTk.PhotoImage(image=Image.fromarray(annotated_frame))
-            self.label.config(image=self.photo)
-
-        self.root.after(30, self.update_frame)
-
-    def log_detection(self, cls, conf, timestamp):
-        message = f"[{timestamp}] Detected: {cls} ({conf:.2f})\n"
-        self.text_box.insert(END, message)
-        self.text_box.see(END)
-
-    def capture_image(self):
-        ret, frame = self.vid.read()
-        if ret:
-            filename = datetime.datetime.now().strftime("capture_%Y%m%d_%H%M%S.jpg")
-            cv2.imwrite(filename, frame)
-            self.log_detection("CAPTURE", 1.0, datetime.datetime.now().strftime("%H:%M:%S"))
-            print(f"Image saved as {filename}")
-
-    def on_closing(self):
-        self.vid.release()
-        self.root.destroy()
+        # ==== Q4: Bottom-Right ====
+        self.q4_frame = Frame(self.root, bg="#252526", bd=2, relief="groove")
+        self.q4_frame.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
+        self.q4_label = Label(self.q4_frame, text="Q4: Counters / FPS", bg="#252526", fg="lime")
+        self.q4_label.pack(fill="both", expand=True)
 
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = WebcamApp(root)
+    app = FourQuadrantApp(root)
     root.mainloop()
