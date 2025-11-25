@@ -1,8 +1,9 @@
 import tkinter as tk
-from tkinter import Frame, Label
+from tkinter import Frame, Label, Text, Scrollbar, END
 import cv2
 from PIL import Image, ImageTk
 from ultralytics import YOLO
+from datetime import datetime
 
 class FourQuadrantApp:
     def __init__(self, root):
@@ -38,19 +39,24 @@ class FourQuadrantApp:
         # Start updating frames
         self.update_frame()
 
-        # Q2 frame
+        # ==== Q2: Top-Right ====
         self.q2_frame = Frame(self.root, bg="#252526", bd=2, relief="groove")
         self.q2_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
         self.q2_label = Label(self.q2_frame, text="Q2: Detection Stats", bg="#252526", fg="white")
         self.q2_label.pack(fill="both", expand=True)
 
-        # Q3 Frame
+        # ==== Q3: Bottom-Left (Logs) ====
         self.q3_frame = Frame(self.root, bg="#1e1e1e", bd=2, relief="groove")
         self.q3_frame.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
-        self.q3_label = Label(self.q3_frame, text="Q3: Logs", bg="#1e1e1e", fg="lime")
-        self.q3_label.pack(fill="both", expand=True)
 
-        # Q4 Frame
+        # Scrollable Text widget for logs
+        self.q3_text = Text(self.q3_frame, bg="#1e1e1e", fg="lime", wrap="none")
+        self.q3_text.pack(side="left", fill="both", expand=True)
+        scrollbar = Scrollbar(self.q3_frame, command=self.q3_text.yview)
+        scrollbar.pack(side="right", fill="y")
+        self.q3_text.config(yscrollcommand=scrollbar.set)
+
+        # ==== Q4: Bottom-Right ====
         self.q4_frame = Frame(self.root, bg="#252526", bd=2, relief="groove")
         self.q4_frame.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
         self.q4_label = Label(self.q4_frame, text="Q4: Counters / FPS", bg="#252526", fg="lime")
@@ -60,10 +66,21 @@ class FourQuadrantApp:
     def update_frame(self):
         ret, frame = self.cap.read()
         if ret:
-
             # Run YOLO
             results = self.model(frame)
             annotated_frame = results[0].plot()
+
+            # Log detections in Q3
+            for result in results:
+                boxes = result.boxes
+                for box in boxes:
+                    cls_id = int(box.cls[0])
+                    conf = float(box.conf[0])
+                    name = self.model.names[cls_id]
+                    timestamp = datetime.now().strftime("%H:%M:%S")
+                    log_msg = f"[{timestamp}] Detected: {name} ({conf:.2f})\n"
+                    self.q3_text.insert(END, log_msg)
+                    self.q3_text.see(END)  # auto-scroll
 
             # Get dynamic quadrant size
             q_width  = self.q1_frame.winfo_width()
@@ -84,7 +101,6 @@ class FourQuadrantApp:
 
         self.root.after(15, self.update_frame)
 
-
     def on_closing(self):
         self.cap.release()
         self.root.destroy()
@@ -95,4 +111,3 @@ if __name__ == "__main__":
     app = FourQuadrantApp(root)
     root.protocol("WM_DELETE_WINDOW", app.on_closing)
     root.mainloop()
-
