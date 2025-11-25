@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import Frame, Label, Text, Scrollbar, END
+from tkinter import Frame, Label
 import cv2
 from PIL import Image, ImageTk
 from ultralytics import YOLO
@@ -47,7 +47,7 @@ class FourQuadrantApp:
         # Store cumulative counts
         self.total_counts = defaultdict(int)
 
-        # ==== Q3: Bottom-Left (Logs) ====
+        # Q3 Frame
         self.q3_frame = Frame(self.root, bg="#1e1e1e", bd=2, relief="groove")
         self.q3_frame.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         self.q3_frame.grid_propagate(False)
@@ -87,6 +87,7 @@ class FourQuadrantApp:
     def update_frame(self):
         ret, frame = self.cap.read()
         if ret:
+
             # Run YOLO
             results = self.model(frame)
             annotated_frame = results[0].plot()
@@ -130,6 +131,7 @@ class FourQuadrantApp:
             self.q1_label.imgtk = imgtk
 
         self.root.after(100, self.update_frame)  # update every 100ms
+
 
     def on_closing(self):
         self.cap.release()
