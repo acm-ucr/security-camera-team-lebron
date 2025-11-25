@@ -36,9 +36,6 @@ class FourQuadrantApp:
         # store the model
         self.model = YOLO("best.pt")
 
-        # Start updating frames
-        self.update_frame()
-
         # ==== Q2: Top-Right ====
         self.q2_frame = Frame(self.root, bg="#252526", bd=2, relief="groove")
         self.q2_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
@@ -61,6 +58,9 @@ class FourQuadrantApp:
         self.q4_frame.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
         self.q4_label = Label(self.q4_frame, text="Q4: Counters / FPS", bg="#252526", fg="lime")
         self.q4_label.pack(fill="both", expand=True)
+
+         # Start updating frames
+        self.update_frame()
 
     # runs the model on every frame
     def update_frame(self):
