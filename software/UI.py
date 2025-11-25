@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import Frame, Label
+from tkinter import Frame, Label, Text, Scrollbar, END
 import cv2
 from PIL import Image, ImageTk
 from ultralytics import YOLO
