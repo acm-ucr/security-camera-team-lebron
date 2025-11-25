@@ -53,8 +53,39 @@ class FourQuadrantApp:
         # Q4 Frame
         self.q4_frame = Frame(self.root, bg="#252526", bd=2, relief="groove")
         self.q4_frame.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
-        self.q4_label = Label(self.q4_frame, text="Q4: Counters / FPS", bg="#252526", fg="lime")
-        self.q4_label.pack(fill="both", expand=True)
+
+        # Prevent auto-resizing
+        self.q4_frame.grid_propagate(False)
+
+        # Use grid inside Q4
+        self.q4_frame.rowconfigure([0, 1, 2, 3, 4], weight=1)
+        self.q4_frame.columnconfigure(0, weight=1)
+
+        # --- Stats ---
+        self.q4_label_stats = Label(self.q4_frame, text="Statistics:", bg="#252526", fg="red")
+        self.q4_label_stats.grid(row=0, column=0, sticky="w")
+
+        self.q4_label_fps = Label(self.q4_frame, text="FPS:", bg="#252526", fg="lime")
+        self.q4_label_fps.grid(row=1, column=0, sticky="w")
+
+        self.q4_label_objects = Label(self.q4_frame, text="Total Objects Detected:", bg="#252526", fg="lime")
+        self.q4_label_objects.grid(row=2, column=0, sticky="w")
+
+        self.q4_label_frequent = Label(self.q4_frame, text="Most Frequent Object:", bg="#252526", fg="lime")
+        self.q4_label_frequent.grid(row=3, column=0, sticky="w")
+
+        # --- Buttons ---
+        self.q4_clear_history_button = tk.Button(self.q4_frame, text="Clear History")
+        self.q4_clear_history_button.grid(row=4, column=0, sticky="ew", pady=2)
+
+        self.q4_toggle_detection_button = tk.Button(self.q4_frame, text="Toggle Detection")
+        self.q4_toggle_detection_button.grid(row=5, column=0, sticky="ew", pady=2)
+
+        self.q4_toggle_boxes_button = tk.Button(self.q4_frame, text="Toggle Boxes")
+        self.q4_toggle_boxes_button.grid(row=6, column=0, sticky="ew", pady=2)
+
+        self.q4_screenshot_button = tk.Button(self.q4_frame, text="Screenshot")
+        self.q4_screenshot_button.grid(row=7, column=0, sticky="ew", pady=2)
 
     # runs the model on every frame
     def update_frame(self):
