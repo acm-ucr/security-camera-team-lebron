@@ -15,7 +15,7 @@ import customtkinter as ctk
 class FourQuadrantApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("ForgeCam - 4 Quadrant Layout")
+        self.root.title("Team Lebron Cam")
         self.root.geometry("1200x700")
         self.root.configure(bg="#1e1e1e")
 
